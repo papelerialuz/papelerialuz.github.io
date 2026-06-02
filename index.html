@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papelería Luz - Inicio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --fondo-rosa-pastel: #fff0f5;
+            --rosa-principal: #ff69b4;
+            --rosa-medio: #ffb6c1;
+            --texto-oscuro: #4a2c40;
+            --blanco-bloque: #ffffff;
+            --amarillo-estrella: #ffca28;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: var(--fondo-rosa-pastel); color: var(--texto-oscuro); padding: 20px 10px; }
+        
+        .sitio-contenedor { max-width: 600px; margin: 0 auto; background: var(--blanco-bloque); border-radius: 20px; box-shadow: 0 10px 30px rgba(255,105,180,0.15); border: 1px solid var(--rosa-medio); overflow: hidden; padding-bottom: 20px; }
+
+        .banner-comercial { background: linear-gradient(135deg, #ff69b4 0%, #ffb6c1 100%); padding: 3rem 1.5rem; text-align: center; color: white; }
+        .banner-comercial h1 { font-size: 2.5rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        .eslogan-frase { font-size: 1.15rem; font-weight: 600; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase; background: rgba(255,255,255,0.2); padding: 6px 15px; border-radius: 20px; display: inline-block; }
+
+        .menu-navegacion { display: flex; background: #ffffff; border-bottom: 2px solid var(--fondo-rosa-pastel); }
+        .enlace-nav { flex: 1; text-align: center; padding: 15px 0; text-decoration: none; color: var(--texto-oscuro); font-weight: 700; font-size: 1rem; }
+        .enlace-nav.activo { color: var(--rosa-principal); border-bottom: 3px solid var(--rosa-principal); background: rgba(255,240,245,0.4); }
+
+        .bloque-contenido { padding: 20px; display: flex; flex-direction: column; gap: 25px; }
+        .seccion-titulo { font-size: 1.4rem; color: var(--texto-oscuro); border-left: 4px solid var(--rosa-principal); padding-left: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+
+        .resena-fundacion { background: #fffcfd; border: 1px solid rgba(255,105,180,0.25); border-radius: 14px; padding: 20px; line-height: 1.6; }
+        .resena-fundacion h2 { font-size: 1.2rem; color: var(--texto-oscuro); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .resena-fundacion p { font-size: 0.95rem; text-align: justify; color: #5a3d50; }
+        .resena-fundacion strong { color: var(--rosa-principal); }
+
+        /* Vitrina de Productos Destacados (Más vendidos rotativos) */
+        .grid-productos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .tarjeta-producto { background: #ffffff; border: 1px solid var(--rosa-medio); border-radius: 14px; padding: 15px; text-align: center; cursor: pointer; transition: transform 0.2s; position: relative; }
+        .tarjeta-producto:hover { transform: translateY(-3px); }
+        .prod-imagen-contenedor { width: 100%; height: 110px; background: #fafafa; border-radius: 10px; margin-bottom: 10px; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        .prod-img { width: 100%; height: 100%; object-fit: cover; }
+        .prod-nombre { font-size: 1rem; font-weight: 700; margin-bottom: 5px; }
+        .prod-precio { color: #d81b60; font-weight: 800; font-size: 1.05rem; }
+        .tag-rotativo { position: absolute; top: 8px; right: 8px; background: #ff4081; color: white; font-size: 0.65rem; font-weight: 800; padding: 3px 6px; border-radius: 8px; text-transform: uppercase; }
+
+        .btn-ver-mas { display: block; text-align: center; background: var(--fondo-rosa-pastel); color: var(--rosa-principal); text-decoration: none; padding: 14px; border-radius: 10px; font-weight: 700; border: 1px dashed var(--rosa-principal); }
+
+        .bloque-contacto-home { background: #fffbfd; border: 1px dashed var(--rosa-medio); border-radius: 14px; padding: 20px; }
+        .enlaces-contacto-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .item-contacto-url { display: flex; align-items: center; gap: 12px; padding: 12px; color: white; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 0.95rem; }
+        .item-contacto-url.wa { background: #25d366; }
+        .item-contacto-url.fb { background: #1877f2; }
+        .item-contacto-url.mail { background: #7c5295; }
+        
+        .mapa-recuadro { text-align: center; background: white; border: 1px solid var(--rosa-medio); border-radius: 10px; padding: 15px; }
+        .btn-ruta-maps { background: var(--rosa-principal); color: white; text-decoration: none; padding: 10px 15px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; }
+
+        /* Modal Emergente */
+        .modal-detalle { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; padding: 20px; z-index: 1000; }
+        .modal-bloque { background: white; width: 100%; max-width: 450px; border-radius: 20px; padding: 25px; border: 2px solid var(--rosa-principal); position: relative; }
+        .cerrar-modal { position: absolute; top: 15px; right: 15px; font-size: 1.3rem; color: #8b658b; cursor: pointer; }
+        .modal-titulo { font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; }
+        .modal-precio { font-size: 1.3rem; color: #d81b60; font-weight: 800; margin-bottom: 15px; }
+        .modal-descripcion { font-size: 0.95rem; line-height: 1.5; color: #5a3d50; margin-bottom: 15px; background: var(--fondo-rosa-pastel); padding: 12px; border-radius: 8px; }
+        .bloque-resena { border-top: 1px dashed var(--rosa-medio); padding-top: 15px; margin-bottom: 20px; }
+        .resena-estrellas { color: var(--amarillo-estrella); font-size: 0.9rem; }
+        .resena-texto { font-size: 0.85rem; font-style: italic; color: #7c5295; }
+        .modal-acciones { display: flex; gap: 10px; }
+        .btn-modal { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; text-align: center; font-size: 0.95rem; }
+        .btn-modal.compra-ya { background: #ff4081; color: white; }
+        .btn-modal.al-carrito { background: var(--rosa-principal); color: white; }
+
+        .burbuja-pedido { display: none; position: fixed; bottom: 25px; right: 25px; background: #25d366; color: white; padding: 15px 20px; border-radius: 30px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 15px rgba(37,211,102,0.4); z-index: 999; align-items: center; gap: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="sitio-contenedor">
+        <div class="banner-comercial">
+            <h1>Papelería Luz</h1>
+            <div class="eslogan-frase">Sueña, inténtalo, lógralo</div>
+        </div>
+
+        <nav class="menu-navegacion">
+            <a href="index.html" class="enlace-nav activo">Inicio</a>
+            <a href="catalogo.html" class="enlace-nav">Catálogo</a>
+            <a href="pedidos.html" class="enlace-nav">Pedidos</a>
+        </nav>
+
+        <main class="bloque-contenido">
+            
+            <div class="resena-fundacion">
+                <h2><i class="fa-solid fa-heart" style="color: var(--rosa-principal);"></i> Nuestra Historia</h2>
+                <p>
+                    Fundada en el año 2024 en la comunidad de <strong>Sombrerete, Álamo Temapache</strong>, Papelería Luz nació bajo la necesidad de la comunidad ya que no contaba con una papelería y la visión familiar de sus fundadores, el <strong>Señor Ignacio López Arguelles</strong> y la <strong>Señora Edith Cortez de la Cruz</strong>, caminando de la mano junto a sus hijos <strong>José Ignacio López Cortez</strong> y <strong>Luz Edith López Cortez</strong>. En aquellos días iniciales, la zona no contaba con un acceso cercano a insumos educativos indispensables. Con el paso del tiempo, el entorno comercial ha crecido y hoy existen más opciones; sin embargo, nuestra firme convicción permanece intacta: ofrecer constantemente <strong>los mejores productos de la región a los precios más competitivos del mercado</strong>, brindando una atención cálida y humana que marca la diferencia todos los días.
+                </p>
+            </div>
+
+            <!-- Vitrina de Rotativos Destacados -->
+            <div>
+                <div class="seccion-titulo">
+                    <span>🔥 Los Más Pedidos del Momento</span>
+                </div>
+                <div class="grid-productos">
+                    <div class="tarjeta-producto" onclick="abrirDetalle('Libretas Star/Swing/Smarty', 45.00, 'Libretas de excelente calidad y resistencia, perfectas para anotaciones escolares. Modelos variados según disponibilidad.', 'Hojas gruesas y portadas con diseños hermosos, ideales para las clases.', 'libretas.jpg')">
+                        <span class="tag-rotativo">Muy Vendido</span>
+                        <div class="prod-imagen-contenedor">
+                            <img src="libretas.jpg" alt="Libretas" class="prod-img">
+                        </div>
+                        <div class="prod-nombre">Libretas Variadas</div>
+                        <div class="prod-precio">$45.00 c/u</div>
+                    </div>
+
+                    <div class="tarjeta-producto" onclick="abrirDetalle('Lapiceros de Punta y Normal', 8.00, 'Lapiceros de trazo fluido y limpio. Disponibles en punta fina y normal para escritura diaria.', 'No se cortan al escribir y duran muchísimo.', 'lapiceros.jpg')">
+                        <span class="tag-rotativo">Básico</span>
+                        <div class="prod-imagen-contenedor">
+                            <img src="lapiceros.jpg" alt="Lapiceros" class="prod-img">
+                        </div>
+                        <div class="prod-nombre">Lapiceros</div>
+                        <div class="prod-precio">$8.00 c/u</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón Salto de Página -->
+            <a href="catalogo.html" class="btn-ver-mas">Ver todos los productos del Catálogo →</a>
+
+            <!-- Bloque de Contacto -->
+            <div class="bloque-contacto-home">
+                <div class="seccion-titulo" style="border-color:#7c5295; margin-bottom:10px; font-size:1.2rem;">
+                    <span>📍 Contacto y Ubicación</span>
+                </div>
+                <div class="enlaces-contacto-grid">
+                    <a href="https://wa.me/527651102141?text=Hola%20Papelería%20Luz" target="_blank" class="item-contacto-url wa">
+                        <i class="fa-brands fa-whatsapp"></i> WhatsApp Directo
+                    </a>
+                    <a href="https://www.facebook.com/share/18cezcwY3a/" target="_blank" class="item-contacto-url fb">
+                        <i class="fa-brands fa-facebook"></i> Facebook Oficial
+                    </a>
+                    <a href="mailto:luzedith1703@gmail.com" class="item-contacto-url mail">
+                        <i class="fa-solid fa-envelope"></i> Correo Electrónico
+                    </a>
+                </div>
+
+                <div class="mapa-recuadro">
+                    <strong style="font-size:0.95rem; display:block;">📍 Ubicación Oficial</strong>
+                    <span style="font-size:0.85rem; color:#8b658b;">Sombrerete, Álamo Temapache, Veracruz, México</span><br>
+                    <a href="https://maps.app.goo.gl/GJiDm4XWTQCLQqUk8" target="_blank" class="btn-ruta-maps">
+                        <i class="fa-solid fa-map-location-dot"></i> Cómo llegar en Google Maps
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Detalle -->
+    <div class="modal-detalle" id="modal-producto">
+        <div class="modal-bloque">
+            <i class="fa-solid fa-xmark cerrar-modal" onclick="cerrarDetalle()"></i>
+            <div class="modal-titulo" id="m-titulo">Producto</div>
+            <div class="modal-precio" id="m-precio">$0.00</div>
+            <div class="modal-descripcion" id="m-desc">Descripción</div>
+            
+            <div class="bloque-resena">
+                <div class="resena-estrellas"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> 5.0</div>
+                <div class="resena-texto" id="m-resena">"Reseña"</div>
+            </div>
+
+            <div class="modal-acciones">
+                <button class="btn-modal al-carrito" onclick="agregarAlCarrito()">Poner en Carrito</button>
+                <button class="btn-modal compra-ya" onclick="comprarInmediato()">Comprar Ya</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Burbuja Flotante -->
+    <a href="pedidos.html" class="burbuja-pedido" id="burbuja-flotante">
+        <i class="fa-solid fa-basket-shopping"></i> Hacer pedido ya (<span id="burbuja-contador">0</span>)
+    </a>
+
+    <script>
+        let prodSeleccionado = {};
+        function abrirDetalle(nombre, precio, desc, resena, img) {
+            prodSeleccionado = { nombre, precio };
+            document.getElementById('m-titulo').innerText = nombre;
+            document.getElementById('m-precio').innerText = '$' + precio.toFixed(2);
+            document.getElementById('m-desc').innerText = desc;
+            document.getElementById('m-resena').innerText = `"${resena}"`;
+            document.getElementById('modal-producto').style.display = 'flex';
+        }
+        function cerrarDetalle() { document.getElementById('modal-producto').style.display = 'none'; }
+        function agregarAlCarrito() {
+            let carrito = JSON.parse(localStorage.getItem('pedido_items')) || [];
+            carrito.push(prodSeleccionado);
+            localStorage.setItem('pedido_items', JSON.stringify(carrito));
+            cerrarDetalle();
+            actualizarBurbuja();
+        }
+        function comprarInmediato() {
+            agregarAlCarrito();
+            window.location.href = 'pedidos.html';
+        }
+        function actualizarBurbuja() {
+            let carrito = JSON.parse(localStorage.getItem('pedido_items')) || [];
+            const b = document.getElementById('burbuja-flotante');
+            if(carrito.length > 0){
+                b.style.display = 'flex';
+                document.getElementById('burbuja-contador').innerText = carrito.length;
+            } else { b.style.display = 'none'; }
+        }
+        actualizarBurbuja();
+    </script>
+</body>
+</html>

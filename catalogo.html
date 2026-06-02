@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papelería Luz - Catálogo de Artículos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --fondo-rosa-pastel: #fff0f5;
+            --rosa-principal: #ff69b4;
+            --rosa-medio: #ffb6c1;
+            --texto-oscuro: #4a2c40;
+            --blanco-bloque: #ffffff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: var(--fondo-rosa-pastel); color: var(--texto-oscuro); padding: 20px 10px; }
+        .sitio-contenedor { max-width: 600px; margin: 0 auto; background: var(--blanco-bloque); border-radius: 20px; box-shadow: 0 10px 30px rgba(255,105,180,0.15); border: 1px solid var(--rosa-medio); overflow: hidden; }
+        
+        .banner-comercial { background: linear-gradient(135deg, #ff69b4 0%, #ffb6c1 100%); padding: 2rem 1.5rem; text-align: center; color: white; }
+        .banner-comercial h1 { font-size: 2rem; font-weight: 800; }
+
+        .menu-navegacion { display: flex; background: #ffffff; border-bottom: 2px solid var(--fondo-rosa-pastel); }
+        .enlace-nav { flex: 1; text-align: center; padding: 15px 0; text-decoration: none; color: var(--texto-oscuro); font-weight: 700; font-size: 1rem; }
+        .enlace-nav.activo { color: var(--rosa-principal); border-bottom: 3px solid var(--rosa-principal); background: rgba(255,240,245,0.4); }
+
+        .bloque-contenido { padding: 20px; display: flex; flex-direction: column; gap: 25px; }
+        .btn-retorno { display: inline-flex; align-items: center; gap: 6px; color: var(--rosa-principal); text-decoration: none; font-weight: 700; font-size: 0.9rem; margin-bottom: -10px; }
+
+        .categoria-bloque { background: #fffcfd; border: 1px solid var(--rosa-medio); border-radius: 14px; padding: 15px; }
+        .categoria-titulo { font-size: 1.15rem; font-weight: 800; color: var(--texto-oscuro); margin-bottom: 15px; border-bottom: 2px solid var(--fondo-rosa-pastel); padding-bottom: 5px; }
+        
+        .grid-catalogo { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .item-catalogo { background: white; border: 1px solid rgba(255,182,193,0.4); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; transition: box-shadow 0.2s; }
+        .item-catalogo:hover { box-shadow: 0 4px 10px rgba(255,105,180,0.1); }
+        .item-img-box { width: 100%; height: 80px; background: #fafafa; border-radius: 6px; margin-bottom: 8px; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        .item-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .item-tit { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; line-height: 1.2; }
+        .item-pru { font-size: 0.9rem; color: #d81b60; font-weight: 800; }
+
+        /* Modal */
+        .modal-detalle { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; padding: 20px; z-index: 1000; }
+        .modal-bloque { background: white; width: 100%; max-width: 450px; border-radius: 20px; padding: 25px; border: 2px solid var(--rosa-principal); position: relative; max-height: 90vh; overflow-y: auto; }
+        .cerrar-modal { position: absolute; top: 15px; right: 15px; font-size: 1.3rem; color: #8b658b; cursor: pointer; }
+        
+        .modal-titulo { font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; color: var(--texto-oscuro); }
+        .modal-precio { font-size: 1.3rem; color: #d81b60; font-weight: 800; margin-bottom: 15px; }
+        
+        .modal-subtitulo { font-size: 0.95rem; font-weight: 700; margin-top: 10px; margin-bottom: 5px; color: var(--texto-oscuro); }
+        .modal-descripcion { font-size: 0.9rem; line-height: 1.4; background: var(--fondo-rosa-pastel); padding: 10px; border-radius: 8px; color: #5a3d50; margin-bottom: 10px; }
+        .modal-caracteristicas { list-style-position: inside; font-size: 0.85rem; color: #5a3d50; margin-bottom: 15px; padding-left: 5px; line-height: 1.5; }
+
+        /* Selectores dinámicos */
+        .bloque-configuracion { background: #fffbfd; padding: 12px; border-radius: 8px; border: 1px dashed var(--rosa-medio); margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .control-grupo { display: flex; flex-direction: column; gap: 4px; }
+        .control-grupo label { font-size: 0.85rem; font-weight: 700; color: var(--texto-oscuro); }
+        .control-grupo select, .control-grupo input { width: 100%; padding: 8px; border: 1px solid var(--rosa-medio); border-radius: 6px; font-weight: 600; color: var(--texto-oscuro); background: white; }
+        .control-grupo input { text-align: center; }
+
+        .modal-acciones { display: flex; gap: 10px; }
+        .btn-modal { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem; text-align: center; }
+        .btn-modal.compra-ya { background: #ff4081; color: white; }
+        .btn-modal.al-carrito { background: var(--rosa-principal); color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="sitio-contenedor">
+        <div class="banner-comercial">
+            <h1>Catálogo de Papelería</h1>
+        </div>
+
+        <nav class="menu-navegacion">
+            <a href="index.html" class="enlace-nav">Inicio</a>
+            <a href="catalogo.html" class="enlace-nav activo">Catálogo</a>
+            <a href="pedidos.html" class="enlace-nav">Pedidos</a>
+        </nav>
+
+        <main class="bloque-contenido">
+            <a href="index.html" class="btn-retorno"><i class="fa-solid fa-arrow-left"></i> Volver a la página principal</a>
+
+            <!-- CATEGORÍA: REGLAS Y GEOMETRÍA -->
+            <div class="categoria-bloque">
+                <div class="categoria-titulo">📐 Sección de Reglas y Geometría</div>
+                <div class="grid-catalogo">
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Artículos de Medición" 
+                         data-precio="12.00" 
+                         data-desc="Reglas, escuadras y herramientas de trazo geométrico de material resistente." 
+                         data-carac="Plástico transparente rígido|Números grandes de alta visibilidad|Ideal para uso escolar"
+                         data-opciones="Regla Recta 30cm ($12.00):12.00|Regla Escuadra ($15.00):15.00|Juego de Geometría Completo ($45.00):45.00"
+                         data-colores="Transparente estándar,Azul Translúcido,Rosa Translúcido">
+                        <div class="item-img-box"><img src="juego_geometria.jpg" alt="Reglas"></div>
+                        <div class="item-tit">Reglas y Juegos de Geometría</div>
+                        <div class="item-pru">Desde $12.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORÍA: HOJAS, FOMIS Y PAPEL -->
+            <div class="categoria-bloque">
+                <div class="categoria-titulo">📄 Hojas, Fomis y Papel</div>
+                <div class="grid-catalogo">
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Hojas Bond" 
+                         data-precio="1.00" 
+                         data-desc="Hojas de excelente calidad tamaño carta para impresiones, apuntes o tareas escolares." 
+                         data-carac="Tamaño carta oficial|Excelente grosor y blancura"
+                         data-opciones="Pieza Suelta ($1.00):1.00|Paquete de 50 pzs ($40.00):40.00|Paquete de 100 pzs ($75.00):75.00"
+                         data-colores="Blancas,Multicolor Surtido,Rosa Pastel,Azul Celeste,Amarillo,Verde Limón">
+                        <div class="item-img-box"><img src="hojas_50.jpg" alt="Hojas"></div>
+                        <div class="item-tit">Hojas Bond (Blanca / Color)</div>
+                        <div class="item-pru">Desde $1.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Fomis Tamaño Carta" 
+                         data-precio="5.00" 
+                         data-desc="Hojas de fomi ideales para manualidades, carteles y decoraciones escolares." 
+                         data-carac="Textura uniforme y flexible|Fácil de moldear y pegar"
+                         data-opciones="Fomi Liso Normal ($5.00):5.00|Fomi Diamantado Brillo ($8.00):8.00"
+                         data-colores="Rojo,Azul,Rosa,Verde,Negro,Dorado,Plata,Blanco">
+                        <div class="item-img-box"><img src="fomi_normal.jpg" alt="Fomis"></div>
+                        <div class="item-tit">Fomis (Normal / Diamantado)</div>
+                        <div class="item-pru">Desde $5.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Cartulinas Extendidas" 
+                         data-precio="6.00" 
+                         data-desc="Cartulinas ideales para láminas de exposición escolar y proyectos." 
+                         data-carac="Gama Iris (Fuerte) o Pastel (Suave)|Excelente resistencia al trazo"
+                         data-opciones="Color Fuerte (Iris) ($6.00):6.00|Color Suave (Pastel) ($6.00):6.00"
+                         data-colores="Blanco,Amarillo,Rosa,Azul,Verde,Naranja,Rojo">
+                        <div class="item-img-box"><img src="cartulinas.jpg" alt="Cartulinas"></div>
+                        <div class="item-tit">Cartulinas (Iris / Pastel)</div>
+                        <div class="item-pru">$6.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Papel Bond Pliego" 
+                         data-precio="7.00" 
+                         data-desc="Pliegos extendidos de papel bond idóneos para rotafolios y exposiciones en equipo." 
+                         data-carac="Tamaño estándar de papelería|Fácil de enrollar y transportar"
+                         data-opciones="Blanco Liso ($7.00):7.00|Cuadriculado Escolar ($7.00):7.00"
+                         data-colores="Blanco Estándar">
+                        <div class="item-img-box"><img src="papel_bond.jpg" alt="Papel bond"></div>
+                        <div class="item-tit">Papel Bond Pliego</div>
+                        <div class="item-pru">$7.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORÍA: ESCRITURA, GOMAS Y CORRECTORES -->
+            <div class="categoria-bloque">
+                <div class="categoria-titulo">✏️ Escritura, Gomas y Correctores</div>
+                <div class="grid-catalogo">
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Lapiceros Escolares" 
+                         data-precio="8.00" 
+                         data-desc="Lapiceros de escritura fluida ideales para apuntes limpios diariamente." 
+                         data-carac="Modelos de punta fina o media|Tinta de secado rápido"
+                         data-opciones="Punta Fina Estándar ($8.00):8.00|Punta Media ($8.00):8.00"
+                         data-colores="Tinta Negra,Tinta Azul,Tinta Roja">
+                        <div class="item-img-box"><img src="lapicero.jpg" alt="Lapiceros"></div>
+                        <div class="item-tit">Lapiceros Variados</div>
+                        <div class="item-pru">$8.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Lápices de Grafito" 
+                         data-precio="5.00" 
+                         data-desc="Lápices clásicos de madera para exámenes, bocetos y uso escolar regular." 
+                         data-carac="Graduación número 2 estándar|Fácil de sacar punta"
+                         data-opciones="Pieza Individual ($5.00):5.00"
+                         data-colores="Amarillo Tradicional">
+                        <div class="item-img-box"><img src="lapiz.jpg" alt="Lápices"></div>
+                        <div class="item-tit">Lápices Escolares</div>
+                        <div class="item-pru">$5.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Borradores" 
+                         data-precio="4.00" 
+                         data-desc="Gomas eficaces para remover trazos de lápiz sin maltratar tus cuadernos." 
+                         data-carac="Estructura firme de alta duración|No mancha las hojas"
+                         data-opciones="Borrador Normal Básico ($4.00):4.00|Borrador Suave de Migaja ($6.00):6.00"
+                         data-colores="Blanco,Surtido de Colores">
+                        <div class="item-img-box"><img src="borrador.jpg" alt="Borradores"></div>
+                        <div class="item-tit">Borradores (Normal / Migaja)</div>
+                        <div class="item-pru">Desde $4.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Correctores Líquidos" 
+                         data-precio="12.00" 
+                         data-desc="Herramientas de alta cobertura para corregir errores de tinta de manera limpia." 
+                         data-carac="Fórmula opaca de secado veloz|Cubre perfectamente todo tipo de tinta"
+                         data-opciones="Corrector de Brocha ($12.00):12.00|Corrector tipo Lápiz/Pluma ($15.00):15.00|Corrector Seco en Cinta ($18.00):18.00"
+                         data-colores="Blanco Opaco">
+                        <div class="item-img-box"><img src="cinta_correctora.jpg" alt="Correctores"></div>
+                        <div class="item-tit">Correctores (Brocha/Lápiz/Cinta)</div>
+                        <div class="item-pru">Desde $12.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORÍA: UNICEL -->
+            <div class="categoria-bloque">
+                <div class="categoria-titulo">⚪ Esferas de Unicel Escolares</div>
+                <div class="grid-catalogo">
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Esferas de Unicel" 
+                         data-precio="3.00" 
+                         data-desc="Cuerpos de unicel indispensables para maquetas del sistema solar, moléculas o manualidades." 
+                         data-carac="Estructura compacta y uniforme|Muy fácil de pintar o decorar con diamantina"
+                         data-opciones="Número 0 ($3.00):3.00|Número 1 ($4.00):4.00|Número 2 ($5.00):5.00|Número 3 ($6.00):6.00|Número 4 ($8.00):8.00|Número 5 ($10.00):10.00"
+                         data-colores="Blanco Unicel">
+                        <div class="item-img-box"><img src="unicel.jpg" alt="Unicel"></div>
+                        <div class="item-tit">Esferas Unicel (N. 0 al 5)</div>
+                        <div class="item-pru">Desde $3.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORÍA: ADHESIVOS Y HERRAMIENTAS (¡Aquí están las libretas con precios por marca!) -->
+            <div class="categoria-bloque">
+                <div class="categoria-titulo">✂️ Adhesivos, Libretas y Herramientas</div>
+                <div class="grid-catalogo">
+                    
+                    <!-- LIBRETAS CON PRECIOS DIFERENTES SEGÚN LA MARCA -->
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Libretas Escolares" 
+                         data-precio="38.00" 
+                         data-desc="Cuadernos profesionales con espiral metálico resistente para apuntes ordenados." 
+                         data-carac="Pastas firmes protectoras|Hojas de gran grosor que no traspasa la tinta"
+                         data-opciones="Marca Swing (Económica) ($38.00):38.00|Marca Estrella (Estándar) ($45.00):45.00|Marca Smarty (Premium) ($52.00):52.00"
+                         data-colores="Raya,Cuadro Grande,Cuadro Chico,Hojas Blancas">
+                        <div class="item-img-box"><img src="libreta.jpg" alt="Libretas"></div>
+                        <div class="item-tit">Libretas Escolares por Marca</div>
+                        <div class="item-pru">Desde $38.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Pegamentos Escolares" 
+                         data-precio="12.00" 
+                         data-desc="Adhesivos esenciales, limpios y completamente seguros para uso infantil." 
+                         data-carac="Excelente agarre rápido|Fórmulas no tóxicas lavables"
+                         data-opciones="Pegamento en Barra Chico ($12.00):12.00|Pegamento en Barra Grande ($22.00):22.00|Pegamento Blanco Líquido ($15.00):15.00"
+                         data-colores="Transparente,Blanco">
+                        <div class="item-img-box"><img src="pegamento.jpg" alt="Pegamentos"></div>
+                        <div class="item-tit">Pegamento Líquido/Barra</div>
+                        <div class="item-pru">Desde $12.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Adhesivos de Silicón" 
+                         data-precio="4.00" 
+                         data-desc="Silicón de alta adherencia ideal para manualidades exigentes en maquetas o fomis." 
+                         data-carac="Fijación fuerte y duradera|Ideal para unir fomi, madera o fieltro"
+                         data-opciones="Barra de Silicón Delgada ($4.00):4.00|Barra de Silicón Gruesa ($7.00):7.00|Bote de Silicón Frío Líquido ($18.00):18.00"
+                         data-colores="Translúcido">
+                        <div class="item-img-box"><img src="silicon.jpg" alt="Silicón"></div>
+                        <div class="item-tit">Silicón Frío / Barras</div>
+                        <div class="item-pru">Desde $4.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Cajas de Colores" 
+                         data-precio="45.00" 
+                         data-desc="Lápices de colores de marcas reconocidas con puntas cremosas y suaves." 
+                         data-carac="Puntas resistentes que no se rompen fácil|Excelente combinación de tonos"
+                         data-opciones="Marca Arcoíris (12 pzs) ($45.00):45.00|Marca Berol (12 pzs) ($65.00):65.00|Marca Smarty Premium (24 pzs) ($110.00):110.00"
+                         data-colores="Surtido Completo de Fábrica">
+                        <div class="item-img-box"><img src="colores.jpg" alt="Colores"></div>
+                        <div class="item-tit">Colores (12 / 24 pzs)</div>
+                        <div class="item-pru">Desde $45.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Tijeras Escolares" 
+                         data-precio="15.00" 
+                         data-desc="Tijeras de corte preciso con hojas metálicas de alta durabilidad." 
+                         data-carac="Filos pulidos de larga duración|Diseño ergonómico"
+                         data-opciones="Marca Smarty Pekes (Punta Roma) ($15.00):15.00|Tijeras Estándar Oficina ($22.00):22.00"
+  data-colores="Azul,Rosa,Verde,Rojo">
+                        <div class="item-img-box"><img src="tijera.jpg" alt="Tijeras"></div>
+                        <div class="item-tit">Tijeras Pekes / Hogar</div>
+                        <div class="item-pru">Desde $15.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Cúters Escolares" 
+                         data-precio="12.00" 
+                         data-desc="Herramientas afiladas para cortes exactos y limpios en materiales rígidos." 
+                         data-carac="Mecanismo deslizable con seguro integrado|Cuchillas de acero intercambiables"
+                         data-opciones="Cúter Chico ($12.00):12.00|Cúter Mediano ($18.00):18.00|Cúter Grande Uso Rudo ($28.00):28.00"
+                         data-colores="Surtido de Fábrica">
+                        <div class="item-img-box"><img src="cuters.jpg" alt="Cuters"></div>
+                        <div class="item-tit">Cúters S/M/L Rudo</div>
+                        <div class="item-pru">Desde $12.00</div>
+                    </div>
+
+                    <!-- PINTURAS CON PRECIOS DE PAQUETE O PIEZA -->
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Pinturas Acrílicas" 
+                         data-precio="14.00" 
+                         data-desc="Pinturas de agua con colores intensos y de gran cobertura para cartulinas o madera."
+                         data-carac="Fórmula soluble en agua no tóxica|Secado mate uniforme"
+                         data-opciones="Pieza Suelta Vinci ($14.00):14.00|Pieza Suelta Politec ($18.00):18.00|Paquete Escolar (6 piezas) ($75.00):75.00"
+                         data-colores="Rojo,Azul,Amarillo,Verde,Blanco,Negro,Rosa,Café,Surtido Paquete">
+                        <div class="item-img-box"><img src="pintura.jpg" alt="Pinturas"></div>
+                        <div class="item-tit">Pinturas Vinci / Politec</div>
+                        <div class="item-pru">Desde $14.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Pinceles Escolares" 
+                         data-precio="5.00" 
+                         data-desc="Pinceles económicos con cerdas firmes que no se desprenden al pintar."
+                         data-carac="Mangos de madera cómodos|Aptos para acuarela o acrílico"
+                         data-opciones="Pincel Pequeño Fino ($5.00):5.00|Pincel Grande Grueso ($9.00):9.00|Paquete Surtido (4 pinceles) ($25.00):25.00"
+                         data-colores="Madera Natural">
+                        <div class="item-img-box"><img src="pinceles.jpg" alt="Pinceles"></div>
+                        <div class="item-tit">Pinceles Ch/Gde</div>
+                        <div class="item-pru">Desde $5.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Cintas Doble Cara" 
+                         data-precio="14.00" 
+                         data-desc="Cintas con adhesivo potente por ambos lados para montajes invisibles limpios."
+                         data-carac="Fácil desprendimiento de protector|Gran adherencia"
+                         data-opciones="Doble Cara Delgada ($14.00):14.00|Doble Cara Fomi Acolchado ($20.00):20.00"
+                         data-colores="Blanco Estándar">
+                        <div class="item-img-box"><img src="cinta_doble.jpg" alt="Cintas doble cara"></div>
+                        <div class="item-tit">Cintas Doble Cara / Fomi</div>
+                        <div class="item-pru">Desde $14.00</div>
+                    </div>
+
+                    <div class="item-catalogo" onclick="verProducto(this)" 
+                         data-nombre="Cintas de Embalaje" 
+                         data-precio="15.00" 
+                         data-desc="Cintas anchas ideales para sellado seguro de cajas y paquetes pesados."
+                         data-carac="Alto poder de adhesión industrial|Resistente a la tensión"
+                         data-opciones="Cinta Transparente Delgada ($15.00):15.00|Cinta Transparente Ancha ($22.00):22.00|Cinta Canela Ancha Comercial ($25.00):25.00"
+                         data-colores="Transparente,Marrón Canela">
+                        <div class="item-img-box"><img src="cinta.jpg" alt="Cintas"></div>
+                        <div class="item-tit">Cinta Normal / Canela</div>
+                        <div class="item-pru">Desde $15.00</div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Ventana Emergente Modal Unificada -->
+    <div class="modal-detalle" id="modal-producto">
+        <div class="modal-bloque">
+            <i class="fa-solid fa-xmark cerrar-modal" onclick="cerrarModal()"></i>
+            
+            <div class="modal-titulo" id="m-titulo">Producto</div>
+            <div class="modal-precio" id="m-precio">$0.00</div>
+            
+            <div class="modal-subtitulo">Descripción:</div>
+            <div class="modal-descripcion" id="m-desc">Descripción aquí.</div>
+            
+            <div class="modal-subtitulo">Características:</div>
+            <ul class="modal-caracteristicas" id="m-caracteristicas"></ul>
+            
+            <div class="bloque-configuracion">
+                <!-- Selector de Presentación / Marca / Tamaño -->
+                <div class="control-grupo" id="contenedor-tipo" style="display: none;">
+                    <label for="m-tipo"><i class="fa-solid fa-layer-group"></i> Selecciona Tipo / Presentación:</label>
+                    <select id="m-tipo" onchange="actualizarPrecioPorOpcion()"></select>
+                </div>
+
+                <!-- Selector de Color / Tipo de Hoja (Cuadro, Raya, etc) -->
+                <div class="control-grupo" id="contenedor-color" style="display: none;">
+                    <label for="m-color"><i class="fa-solid fa-palette"></i> Elige Variante / Color / Estilo:</label>
+                    <select id="m-color"></select>
+                </div>
+
+                <!-- Selector de cantidad -->
+                <div class="control-grupo">
+                    <label for="m-cantidad"><i class="fa-solid fa-boxes-stacked"></i> Cantidad a llevar:</label>
+                    <input type="number" id="m-cantidad" value="1" min="1">
+                </div>
+            </div>
+
+            <div class="modal-acciones">
+                <button class="btn-modal al-carrito" onclick="agregarAlCarrito()">Poner en Carrito</button>
+                <button class="btn-modal compra-ya" onclick="comprarInmediato()">Comprar Ya</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let productoActivo = {};
+
+        function verProducto(elementoHTML) {
+            const nombre = elementoHTML.getAttribute('data-nombre');
+            const precioBase = parseFloat(elementoHTML.getAttribute('data-precio')) || 0;
+            const desc = elementoHTML.getAttribute('data-desc');
+            const caracTexto = elementoHTML.getAttribute('data-carac') || '';
+            const opcionesTexto = elementoHTML.getAttribute('data-opciones') || '';
+            const coloresTexto = elementoHTML.getAttribute('data-colores') || '';
+
+            productoActivo = { nombreBase: nombre, precioActual: precioBase };
+            
+            document.getElementById('m-titulo').innerText = nombre;
+            document.getElementById('m-precio').innerText = '$' + precioBase.toFixed(2);
+            document.getElementById('m-desc').innerText = desc;
+            document.getElementById('m-cantidad').value = 1;
+            
+            // Características
+            const listaHTML = document.getElementById('m-caracteristicas');
+            listaHTML.innerHTML = '';
+            caracTexto.split('|').forEach(l => {
+                if(l.trim() !== "") {
+                    const li = document.createElement('li');
+                    li.innerText = l;
+                    listaHTML.appendChild(li);
+                }
+            });
+
+            // Procesar Opciones / Marcas / Tamaños con cambio de precio
+            const comboTipo = document.getElementById('m-tipo');
+            const divTipo = document.getElementById('contenedor-tipo');
+            comboTipo.innerHTML = '';
+            
+            if (opcionesTexto) {
+                divTipo.style.display = 'flex';
+                opcionesTexto.split('|').forEach(opc => {
+                    const partes = opc.split(':');
+                    const option = document.createElement('option');
+                    option.text = partes[0];
+                    option.value = partes[1];
+                    comboTipo.appendChild(option);
+                });
+                productoActivo.precioActual = parseFloat(comboTipo.value);
+                document.getElementById('m-precio').innerText = '$' + productoActivo.precioActual.toFixed(2);
+            } else {
+                divTipo.style.display = 'none';
+            }
+
+            // Procesar Colores / Estilos (Raya, Cuadro, Colores)
+            const comboColor = document.getElementById('m-color');
+            const divColor = document.getElementById('contenedor-color');
+            comboColor.innerHTML = '';
+
+            if (coloresTexto) {
+                divColor.style.display = 'flex';
+                coloresTexto.split(',').forEach(col => {
+                    const option = document.createElement('option');
+                    option.text = col;
+                    option.value = col;
+                    comboColor.appendChild(option);
+                });
+            } else {
+                divColor.style.display = 'none';
+            }
+            
+            document.getElementById('modal-producto').style.display = 'flex';
+        }
+
+        function actualizarPrecioPorOpcion() {
+            const comboTipo = document.getElementById('m-tipo');
+            if (comboTipo.options.length > 0) {
+                productoActivo.precioActual = parseFloat(comboTipo.value);
+                document.getElementById('m-precio').innerText = '$' + productoActivo.precioActual.toFixed(2);
+            }
+        }
+
+        function cerrarModal() { 
+            document.getElementById('modal-producto').style.display = 'none'; 
+        }
+
+        function agregarAlCarrito() {
+            let carrito = JSON.parse(localStorage.getItem('pedido_items')) || [];
+            const cantidadEscogida = parseInt(document.getElementById('m-cantidad').value) || 1;
+            
+            const divTipo = document.getElementById('contenedor-tipo');
+            const divColor = document.getElementById('contenedor-color');
+            
+            let detalleTipo = divTipo.style.display !== 'none' ? document.getElementById('m-tipo').options[document.getElementById('m-tipo').selectedIndex].text : '';
+            let detalleColor = divColor.style.display !== 'none' ? ' - Tipo/Color: ' + document.getElementById('m-color').value : '';
+
+            // Estructura limpia para el carrito de compras
+            let nombreCompletoProducto = productoActivo.nombreBase;
+            if (detalleTipo) nombreCompletoProducto += ` [${detalleTipo}]`;
+            if (detalleColor) nombreCompletoProducto += `${detalleColor}`;
+
+            for (let i = 0; i < cantidadEscogida; i++) {
+                carrito.push({
+                    nombre: nombreCompletoProducto,
+                    precio: productoActivo.precioActual
+                });
+            }
+            
+            localStorage.setItem('pedido_items', JSON.stringify(carrito));
+            cerrarModal();
+            alert('📌 Añadido: ' + cantidadEscogida + ' pieza(s) de "' + nombreCompletoProducto + '" registradas en tus Pedidos.');
+        }
+
+        function comprarInmediato() {
+            agregarAlCarrito();
+            window.location.href = 'pedidos.html';
+        }
+    </script>
+</body>
+</html>                   

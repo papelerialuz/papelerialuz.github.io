@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papelería Luz - Mis Pedidos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --fondo-rosa-pastel: #fff0f5;
+            --rosa-principal: #ff69b4;
+            --rosa-medio: #ffb6c1;
+            --texto-oscuro: #4a2c40;
+            --blanco-bloque: #ffffff;
+            --rojo-cancelar: #e57373;
+            --rojo-oscuro: #c62828;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: var(--fondo-rosa-pastel); color: var(--texto-oscuro); padding: 20px 10px; }
+        .sitio-contenedor { max-width: 600px; margin: 0 auto; background: var(--blanco-bloque); border-radius: 20px; box-shadow: 0 10px 30px rgba(255,105,180,0.15); border: 1px solid var(--rosa-medio); overflow: hidden; }
+        
+        .banner-comercial { background: linear-gradient(135deg, #ff69b4 0%, #ffb6c1 100%); padding: 2rem 1.5rem; text-align: center; color: white; }
+        .banner-comercial h1 { font-size: 2rem; font-weight: 800; }
+
+        .menu-navegacion { display: flex; background: #ffffff; border-bottom: 2px solid var(--fondo-rosa-pastel); }
+        .enlace-nav { flex: 1; text-align: center; padding: 15px 0; text-decoration: none; color: var(--texto-oscuro); font-weight: 700; font-size: 1rem; }
+        .enlace-nav.activo { color: var(--rosa-principal); border-bottom: 3px solid var(--rosa-principal); background: rgba(255,240,245,0.4); }
+
+        .bloque-contenido { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* Lista de productos en el carrito */
+        .tabla-pedidos { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .item-fila { border-bottom: 1px solid var(--fondo-rosa-pastel); }
+        .item-fila td { padding: 12px 8px; font-size: 0.95rem; }
+        .col-nombre { font-weight: 600; }
+        .col-precio { text-align: right; color: #d81b60; font-weight: 700; }
+        
+        /* Botón para quitar un solo producto */
+        .btn-quitar { background: none; border: none; color: var(--rojo-cancelar); cursor: pointer; font-size: 1.1rem; transition: color 0.2s; }
+        .btn-quitar:hover { color: var(--rojo-oscuro); }
+
+        .bloque-total { display: flex; justify-content: space-between; padding: 15px 8px; background: var(--fondo-rosa-pastel); border-radius: 10px; font-size: 1.2rem; font-weight: 800; margin-top: 10px; }
+        
+        /* Botonera de Acciones (Enviar o Cancelar Todo) */
+        .zona-botones { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .btn-accion { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; text-align: center; text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        
+        .btn-whatsapp { background-color: #25d366; color: white; }
+        .btn-whatsapp:hover { background-color: #128c7e; }
+        
+        .btn-cancelar-todo { background-color: #ffebee; color: var(--rojo-oscuro); border: 1px solid var(--rojo-cancelar); }
+        .btn-cancelar-todo:hover { background-color: #ffcdd2; }
+
+        .carrito-vacio { text-align: center; padding: 40px 20px; color: #8b658b; font-size: 1.1rem; }
+        .carrito-vacio i { font-size: 3rem; color: var(--rosa-medio); margin-bottom: 15px; display: block; }
+        .btn-regresar { display: inline-block; margin-top: 15px; background: var(--rosa-principal); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <div class="sitio-contenedor">
+        <div class="banner-comercial">
+            <h1>Mis Pedidos</h1>
+        </div>
+
+        <nav class="menu-navegacion">
+            <a href="index.html" class="enlace-nav">Inicio</a>
+            <a href="catalogo.html" class="enlace-nav">Catálogo</a>
+            <a href="pedidos.html" class="enlace-nav activo">Pedidos</a>
+        </nav>
+
+        <main class="bloque-contenido">
+            
+            <div id="contenedor-carrito">
+                </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Función principal para leer y renderizar los productos guardados
+        function cargarCarrito() {
+            const contenedor = document.getElementById('contenedor-carrito');
+            const carrito = JSON.parse(localStorage.getItem('pedido_items')) || [];
+
+            // Si no hay productos seleccionados
+            if (carrito.length === 0) {
+                contenedor.innerHTML = `
+                    <div class="carrito-vacio">
+                        <i class="fa-solid fa-basket-shopping"></i>
+                        <p>Tu lista de pedidos está vacía.</p>
+                        <a href="catalogo.html" class="btn-regresar">Ir al Catálogo</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Agrupar productos iguales para mostrar cantidad de manera ordenada
+            const productosAgrupados = {};
+            carrito.forEach((item, indiceOriginal) => {
+                if (!productosAgrupados[item.nombre]) {
+                    productosAgrupados[item.nombre] = {
+                        precio: item.precio,
+                        cantidad: 0,
+                        indices: [] // Guardamos las posiciones reales para poder borrarlos luego
+                    };
+                }
+                productosAgrupados[item.nombre].cantidad++;
+                productosAgrupados[item.nombre].indices.push(indiceOriginal);
+            });
+
+            // Construir la estructura de la lista y la tabla
+            let htmlEstructura = `
+                <table class="tabla-pedidos">
+                    <tbody>
+            `;
+
+            let granTotal = 0;
+
+            // Recorrer los productos agrupados para armar las filas
+            for (const nombreProd in productosAgrupados) {
+                const info = productosAgrupados[nombreProd];
+                const subtotalItem = info.precio * info.cantidad;
+                granTotal += subtotalItem;
+
+                htmlEstructura += `
+                    <tr class="item-fila">
+                        <td class="col-nombre">${info.cantidad}x ${nombreProd}</td>
+                        <td class="col-precio">$${subtotalItem.toFixed(2)}</td>
+                        <td style="text-align: center; width: 40px;">
+                            <button class="btn-quitar" onclick="quitarArticulo('${nombreProd}')" title="Quitar del pedido">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            htmlEstructura += `
+                    </tbody>
+                </table>
+                
+                <div class="bloque-total">
+                    <span>Total estimado:</span>
+                    <span>$${granTotal.toFixed(2)}</span>
+                </div>
+
+                <div class="zona-botones">
+                    <button class="btn-accion btn-whatsapp" onclick="enviarPedidoWhatsApp(${granTotal})">
+                        <i class="fa-brands fa-whatsapp"></i> Confirmar y Enviar Pedido
+                    </button>
+                    <button class="btn-accion btn-cancelar-todo" onclick="cancelarTodoElPedido()">
+                        <i class="fa-solid fa-ban"></i> Cancelar todo el pedido
+                    </button>
+                </div>
+            `;
+
+            contenedor.innerHTML = htmlEstructura;
+        }
+
+        // 1. FUNCIÓN PARA QUITAR UN SOLO PRODUCTO (Quita de uno en uno)
+        function quitarArticulo(nombreProducto) {
+            let carrito = JSON.parse(localStorage.getItem('pedido_items')) || [];
+            
+            // Buscamos el primer índice que coincida con ese nombre
+            const indiceEncontrado = carrito.findIndex(item => item.nombre === nombreProducto);
+            
+            if (indiceEncontrado !== -1) {
+                // Removemos solo ese elemento del arreglo
+                carrito.splice(indiceEncontrado, 1);
+                // Guardamos la nueva lista limpia
+                localStorage.setItem('pedido_items', JSON.stringify(carrito));
+                // Recargamos la interfaz en la pantalla
+                cargarCarrito();
+            }
+        }
+
+        // 2. FUNCIÓN PARA CANCELAR TODO EL CARRITO DE UN JALÓN
+        function cancelarTodoElPedido() {
+            const respuesta = confirm("⚠️ ¿Estás seguro de que deseas cancelar y borrar todo tu pedido actual?");
+            if (respuesta) {
+                // Borramos la clave del carrito por completo
+                localStorage.removeItem('pedido_items');
+                // Recargamos la pantalla para mostrar el estado vacío
+                cargarCarrito();
+            }
+        }
+
+        // Lógica de empaquetado final de texto para mandar por WhatsApp
+        function enviarPedidoWhatsApp(total) {
+            const carrito = JSON.parse(localStorage.getItem('pedido_items')) || [];
+            
+            // Agrupar de nuevo brevemente para el texto de mensaje limpio
+            const resumen = {};
+            carrito.forEach(item => {
+                resumen[item.name || item.nombre] = (resumen[item.name || item.nombre] || 0) + 1;
+            });
+
+            let mensaje = "¡Hola! Me gustaría realizar el siguiente pedido en Papelería Luz:\n\n";
+            for (const prod in resumen) {
+                mensaje += `• ${resumen[prod]}x ${prod}\n`;
+            }
+            mensaje += `\n*Total Estimado:* $${total.toFixed(2)}`;
+
+            // Cambia este número por el de tu papelería oficial
+            const tuNumeroTelefono = "521234567890"; 
+            const urlWhatsApp = `https://api.whatsapp.com/send?phone=${tuNumeroTelefono}&text=${encodeURIComponent(mensaje)}`;
+            
+            window.open(urlWhatsApp, '_blank');
+        }
+
+        // Iniciar la carga al abrir la página
+        window.onload = cargarCarrito;
+    </script>
+</body>
+</html>
